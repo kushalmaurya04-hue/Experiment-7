@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Experiment 7 - Notes App</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- React Libraries -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+</head>
+
+<body class="bg-light">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+
+        function NotesApp() {
+
+            const [notes, setNotes] = React.useState([]);
+            const [title, setTitle] = React.useState("");
+            const [description, setDescription] = React.useState("");
+            const [editId, setEditId] = React.useState(null);
+
+            // Add or Update Note
+            function handleSubmit(e) {
+                e.preventDefault();
+
+                if (title.trim() === "" || description.trim() === "") {
+                    alert("Please fill all fields");
+                    return;
+                }
+
+                if (editId !== null) {
+
+                    setNotes(notes.map(note =>
+                        note.id === editId
+                            ? { ...note, title, description }
+                            : note
+                    ));
+
+                    setEditId(null);
+
+                } else {
+
+                    const newNote = {
+                        id: Date.now(),
+                        title: title,
+                        description: description
+                    };
+
+                    setNotes([...notes, newNote]);
+                }
+
+                setTitle("");
+                setDescription("");
+            }
+
+            // Edit Note
+            function editNote(note) {
+                setTitle(note.title);
+                setDescription(note.description);
+                setEditId(note.id);
+            }
+
+            // Delete Note
+            function deleteNote(id) {
+                setNotes(notes.filter(note => note.id !== id));
+            }
+
+            return (
+
+                <div className="container py-5">
+
+                    <div className="text-center mb-4">
+                        <h1 className="text-primary fw-bold">
+                            My Notes App
+                        </h1>
+
+                        <p className="text-muted">
+                            Web Designing - Experiment 7
+                        </p>
+                    </div>
+
+                    <div className="card shadow-sm mx-auto mb-4"
+                         style={{maxWidth: "650px"}}>
+
+                        <div className="card-body p-4">
+
+                            <h4 className="mb-3">
+                                {editId !== null ? "Update Note" : "Add a New Note"}
+                            </h4>
+
+                            <form onSubmit={handleSubmit}>
+
+                                <div className="mb-3">
+                                    <label className="form-label">
+                                        Note Title
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Enter note title"
+                                        value={title}
+                                        onChange={e => setTitle(e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="mb-3">
+                                    <label className="form-label">
+                                        Note Description
+                                    </label>
+
+                                    <textarea
+                                        className="form-control"
+                                        rows="3"
+                                        placeholder="Write your note here"
+                                        value={description}
+                                        onChange={e => setDescription(e.target.value)}
+                                    ></textarea>
+                                </div>
+
+                                <button type="submit" className="btn btn-primary">
+                                    {editId !== null ? "Save Changes" : "Add Note"}
+                                </button>
+
+                                {editId !== null && (
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary ms-2"
+                                        onClick={() => {
+                                            setEditId(null);
+                                            setTitle("");
+                                            setDescription("");
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                )}
+
+                            </form>
+
+                        </div>
+                    </div>
+
+                    <div className="mx-auto" style={{maxWidth: "900px"}}>
+
+                        <h4 className="mb-3">
+                            Your Notes ({notes.length})
+                        </h4>
+
+                        {notes.length === 0 ? (
+
+                            <div className="alert alert-info text-center">
+                                No notes yet. Add your first note!
+                            </div>
+
+                        ) : (
+
+                            <div className="row g-3">
+
+                                {notes.map(note => (
+
+                                    <div className="col-md-6" key={note.id}>
+
+                                        <div className="card shadow-sm h-100">
+
+                                            <div className="card-body">
+
+                                                <h5 className="card-title">
+                                                    {note.title}
+                                                </h5>
+
+                                                <p className="card-text">
+                                                    {note.description}
+                                                </p>
+
+                                                <button
+                                                    className="btn btn-warning btn-sm me-2"
+                                                    onClick={() => editNote(note)}
+                                                >
+                                                    Edit
+                                                </button>
+
+                                                <button
+                                                    className="btn btn-danger btn-sm"
+                                                    onClick={() => deleteNote(note.id)}
+                                                >
+                                                    Delete
+                                                </button>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                ))}
+
+                            </div>
+
+                        )}
+
+                    </div>
+
+                    <footer className="text-center text-muted mt-5">
+                        Created using React.js and Bootstrap
+                    </footer>
+
+                </div>
+
+            );
+        }
+
+        const root = ReactDOM.createRoot(
+            document.getElementById("root")
+        );
+
+        root.render(<NotesApp />);
+
+    </script>
+
+</body>
+</html>
